@@ -49,8 +49,8 @@ Releases publish to PyPI via GitHub Actions trusted publishing (OIDC, no tokens)
 
 ```sh
 # bump version in pyproject.toml, commit, then:
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.0.1
+git push origin v0.0.1
 ```
 
 The tag triggers `.github/workflows/release.yml`, which builds and uploads to PyPI.
