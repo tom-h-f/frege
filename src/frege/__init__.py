@@ -1,25 +1,47 @@
 """frege: a small library for propositional logic and formal systems."""
 
-from frege.logic import (
+from frege.element import (
     And,
-    Assignment,
-    Expr,
+    Element,
+    Implies,
     Not,
     Or,
-    Var,
-    evaluate,
-    truth_table,
-    variables,
+    Variable,
 )
+from frege.formula import Formula
+from frege.parse import (
+    ParseError,
+    parse,
+    parse_element,
+    parse_formula,
+    parse_theory,
+)
+from frege.symbol import (
+    FirstOrderLogicLanguage,
+    MetalogicLanguage,
+    ModalLogicLanguage,
+    PropositionalLogicLanguage,
+    Symbol,
+)
+from frege.theory import Theory
 
 __all__ = [
-    "And",
-    "Assignment",
-    "Expr",
+    "Element",
+    "Variable",
     "Not",
+    "And",
     "Or",
-    "Var",
-    "evaluate",
-    "truth_table",
-    "variables",
+    "Implies",
+    "Formula",
+    "Theory",
+    "Symbol",
+    "PropositionalLogicLanguage",
+    "FirstOrderLogicLanguage",
+    "ModalLogicLanguage",
+    "MetalogicLanguage",
+    "parse",
+    "parse_element",
+    "parse_formula",
+    "parse_theory",
+    "ParseError",
 ]
