@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from frege.element import (
     And,
     Element,
@@ -33,7 +35,7 @@ class Formula:
 
     def _binary(
         self,
-        kind: type[Element],
+        kind: Callable[[Element, Element], Element],
         right: Element | str,
         left: Element | str | None,
     ) -> Formula:

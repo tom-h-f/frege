@@ -52,7 +52,9 @@ def test_children_are_linked_to_parent():
 
 def test_walk_up_to_root():
     root = parse_formula("A & B → C").root()
+    assert isinstance(root, Implies)
     conjunction = root.left
+    assert isinstance(conjunction, And)
     leaf_a = conjunction.left
 
     assert root.parent is None

@@ -57,8 +57,8 @@ _SEPARATORS = {";", "\n"}
 _NOTATIONS = [
     (notation, kind)
     for kind in TokenKind
-    if kind.symbol() is not None
-    for notation in kind.symbol().notations
+    if (symbol := kind.symbol()) is not None
+    for notation in symbol.notations
 ]
 _SYMBOLS = {notation: kind for notation, kind in _NOTATIONS if not notation.isalnum()}
 _KEYWORDS = {notation.lower(): kind for notation, kind in _NOTATIONS if notation.isalnum()}

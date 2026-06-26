@@ -9,7 +9,7 @@ def test_conj_defaults_left_to_previous():
 
 
 def test_mixed_connectives_render_minimal_parens():
-    assert str(Formula().var("A").conj("B").impl("C")) == "A ∧ B → C"
+    assert str(Formula().var("A").conj("B").implies("C")) == "A ∧ B → C"
 
 
 def test_neg_wraps_previous():
