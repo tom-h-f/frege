@@ -70,6 +70,15 @@ class Element(ABC):
 
 
 @dataclass(frozen=True)
+class PlaceholderElement(Element):
+    def symbol(self) -> Symbol:
+        return Symbol.EMPTY
+
+    def _render(self) -> str:
+        return str(self.symbol())
+
+
+@dataclass(frozen=True)
 class LeftAssociativeElement(Element):
     left: Element
     right: Element

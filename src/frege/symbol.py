@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from enum import Enum
 
@@ -53,6 +54,8 @@ class Symbol(Enum):
     `notations` is every interchangeable spelling the tokenizer will accept.
     """
 
+    EMPTY = ""
+
     NOT = "¬"
     AND = "∧"
     OR = "∨"
@@ -81,6 +84,7 @@ _NOTATIONS = {
 }
 
 _PRECEDENCE = {
+    Symbol.EMPTY: sys.maxsize,
     Symbol.NOT: 50,
     Symbol.AND: 40,
     Symbol.OR: 30,
