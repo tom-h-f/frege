@@ -255,7 +255,7 @@ def _insert_binary(
         target.precedence() < precedence
         or (target.precedence() == precedence and right_associative)
     ):
-        target = target.right  # type: ignore[attr-defined]
+        target = target.right  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
     created = kind(target, right)
     return _replace(root, target, created), created
 
