@@ -9,62 +9,76 @@ from frege.element import (
     Or,
     PlaceholderElement,
     Variable,
+    _coerce_operand,
+    _insert_binary,
+    _rightmost,
 )
-
-
-def _coerce_operand(value: Element | str) -> Element:
-    return value if isinstance(value, Element) else Variable(value)
+from frege.symbol import Symbol
 
 
 class Formula:
     _root: Element
 
     def __init__(self, root: Element | None = None):
-        self._root = root if root is not None else PlaceholderElement()
+        self._adopt(root if root is not None else PlaceholderElement())
 
     def root(self) -> Element:
         return self._root
 
+    def last(self) -> Element:
+        """The rightmost, furthest-descended operand: where the next op attaches."""
+        return _rightmost(self._root)
+
     def elements(self) -> set[Element]:
         return _walk(self._root)
 
-    def _previous(self) -> Element:
-        if isinstance(self._root, PlaceholderElement):
-            raise ValueError("no previous element to combine with")
-        return self._root
+    def _adopt(self, root: Element) -> Element:
+        self._root = root
+        object.__setattr__(root, "_formula", self)
+        return root
 
     def _binary(
         self,
         kind: Callable[[Element, Element], Element],
+        precedence: int,
+        right_associative: bool,
         right: Element | str,
         left: Element | str | None,
-    ) -> Formula:
-        left_el = _coerce_operand(left) if left is not None else self._previous()
-        self._root = kind(left_el, _coerce_operand(right))
-        return self
+    ) -> Element:
+        if left is not None:
+            return self._adopt(kind(_coerce_operand(left), _coerce_operand(right)))
+        if isinstance(self._root, PlaceholderElement):
+            raise ValueError("no previous element to combine with")
+        new_root, created = _insert_binary(
+            self._root, kind, precedence, right_associative, _coerce_operand(right)
+        )
+        self._adopt(new_root)
+        object.__setattr__(created, "_formula", self)
+        return created
 
-    def var(self, name: str) -> Formula:
+    def var(self, name: str) -> Element:
         if not isinstance(self._root, PlaceholderElement):
             raise ValueError("formula already has a root; nothing to attach a bare variable to")
-        self._root = Variable(name)
-        return self
+        return self._adopt(Variable(name))
 
-    def conj(self, right: Element | str, left: Element | str | None = None) -> Formula:
-        return self._binary(And, right, left)
+    def conj(self, right: Element | str, left: Element | str | None = None) -> Element:
+        return self._binary(And, Symbol.AND.precedence, False, right, left)
 
-    def disj(self, right: Element | str, left: Element | str | None = None) -> Formula:
-        return self._binary(Or, right, left)
+    def disj(self, right: Element | str, left: Element | str | None = None) -> Element:
+        return self._binary(Or, Symbol.OR.precedence, False, right, left)
 
-    def implies(self, right: Element | str, left: Element | str | None = None) -> Formula:
-        return self._binary(Implies, right, left)
+    def implies(self, right: Element | str, left: Element | str | None = None) -> Element:
+        return self._binary(Implies, Symbol.IMPLIES.precedence, True, right, left)
 
-    def iff(self, right: Element | str, left: Element | str | None = None) -> Formula:
-        return self._binary(IfAndOnlyIf, right, left)
+    def iff(self, right: Element | str, left: Element | str | None = None) -> Element:
+        return self._binary(IfAndOnlyIf, Symbol.IFF.precedence, True, right, left)
 
-    def neg(self, operand: Element | str | None = None) -> Formula:
-        target = _coerce_operand(operand) if operand is not None else self._previous()
-        self._root = Not(target)
-        return self
+    def neg(self, operand: Element | str | None = None) -> Element:
+        if operand is not None:
+            return self._adopt(Not(_coerce_operand(operand)))
+        if isinstance(self._root, PlaceholderElement):
+            raise ValueError("no previous element to negate")
+        return self._adopt(Not(self._root))
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Formula) and self._root == other._root
