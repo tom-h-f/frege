@@ -57,8 +57,6 @@ class Formula:
         return created
 
     def var(self, name: str) -> Element:
-        if not isinstance(self._root, PlaceholderElement):
-            raise ValueError("formula already has a root; nothing to attach a bare variable to")
         return self._adopt(Variable(name))
 
     def conj(self, right: Element | str, left: Element | str | None = None) -> Element:
